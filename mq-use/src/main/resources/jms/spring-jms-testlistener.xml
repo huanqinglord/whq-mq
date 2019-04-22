@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+
+	<description>JMS应用配置</description>
+	<!--任务单 Queue定义 -->
+	<bean id="testQueue1" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="q.test" />
+	</bean>
+	<!-- 异步接收Queue消息Container -->
+	<!-- 多个监听类配置的时候此处BeanId不能重复 -->
+	<bean id="svcFulfillMsgContainerTestListener"
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="destination" ref="testQueue1" />
+		<property name="messageListener" ref="testListener" />
+		
+		<!-- 初始10个Consumer, 可动态扩展到20 -->
+		<property name="concurrentConsumers" value="10" />
+		<property name="maxConcurrentConsumers" value="20" />
+	</bean>
+
+
+	<!-- 异步接收消息处理类 -->
+	<bean id="testListener" class="com.whq.mq.active.listenermessage.MapListener" />
+</beans>
